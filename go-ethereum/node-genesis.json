@@ -1,0 +1,22 @@
+{
+  "config": {
+    "chainId": 2019,
+    "homesteadBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip158Block": 0,
+    "byzantiumBlock": 0,
+    "constantinopleBlock":0,
+    "constantinopleFixBlock":0
+  },
+  "difficulty": "400",
+  "gasLimit": "2000000",
+  "alloc": {
+    "0x51d9C3Ac566eaA8Edcb45A6FC602d6412DEa2e12": {
+    "balance": "100000000000000000000000"
+    },
+    "0xa93E9EE4c3873b540562788e71863eac4392d195": {
+    "balance": "120000000000000000000000"
+    }
+  }
+}

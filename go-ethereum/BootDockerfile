@@ -1,0 +1,13 @@
+# Build Geth in a stock Go builder container
+FROM ethereum/client-go:alltools-latest
+
+RUN apk update
+RUN apk add bash
+
+RUN mkdir /app
+WORKDIR /app
+COPY master-genesis.json ./genesis.json
+COPY eth-scripts /app/
+
+EXPOSE 8545 8546 30303 30303/udp
+CMD ["/bin/bash"]
