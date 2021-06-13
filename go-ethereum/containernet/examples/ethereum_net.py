@@ -58,10 +58,12 @@ def topology(args):
     for h in net.hosts[1:]:
         h.cmdPrint('./eth-scripts/start-new-bc.sh &')
 
-    info('*** Running CLI\n')
-    CLI(net)
-    info('*** Stopping network')
-    net.stop()
+    info('*** Chain is running...\n')
+
+#    info('*** Running CLI\n')
+#    CLI(net)
+#    info('*** Stopping network')
+#    net.stop()
 
 if __name__ == '__main__':
     setLogLevel('info')
