@@ -16,7 +16,8 @@ RUN apk add bash
 
 RUN mkdir /app
 WORKDIR /app
-COPY node-genesis.json ./genesis.json
+COPY ethdata /app/ethdata
+COPY GenesisFiles/master-genesis.json ./genesis.json
 
 EXPOSE 8545 8546 30303 30303/udp
-ENTRYPOINT ["geth"]
+ENTRYPOINT ["geth_entrypoint.sh"]

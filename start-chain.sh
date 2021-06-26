@@ -1,11 +1,13 @@
 #!/bin/bash
-script="start-chain-test.sh"
+script="start-chain.sh"
 #Declare the number of mandatory args
 margs=2
 
+consensus="pow"
+
 # Common functions - BEGIN
 function example {
-    echo -e "example: $script -p VAL -cs VAL -o1 -o2 VAL"
+    echo -e "example: $script -p my_password -cs 3 -c pow -o2 VAL"
 }
 
 function usage {
@@ -15,10 +17,10 @@ function usage {
 function help {
   usage
     echo -e "MANDATORY:"
-    echo -e "  -p, --password  VAL  You sudo password. Mininet requires root."
-    echo -e "  -cs, --chain-size  VAL  The number of nodes in the desired chain.\n"
+    echo -e "  -p, --password  your_password  -- Your sudo password. Mininet requires root."
+    echo -e "  -cs, --chain-size  number  -- The number of nodes in the desired chain.\n"
     echo -e "OPTION:"
-    echo -e "  -o0, --optional1        The desc of the optional0 boolean parameter"
+    echo -e "  -c, --consensus poa/pow --  The consensus type for the chain poa or pow (pow is default)"
     echo -e "  -o1, --optional2   VAL  The desc of the optional1 String  parameter"
     echo -e "  -h,  --help             Prints this help\n"
   example
@@ -43,8 +45,7 @@ function margs_precheck {
 # Ensures that all the mandatory args are not empty
 function margs_check {
 	if [ $# -lt $margs ]; then
-	    usage
-	  	example
+	    help
 	    exit 1 # error
 	fi
 }
@@ -58,25 +59,26 @@ function margs_check {
 margs_precheck $# $1
 
 marg0=
-marg1=
-oarg0="false"
+size=1
+consensus="pow"
 oarg1="default"
 
 # Args while-loop
 while [ "$1" != "" ];
 do
    case $1 in
-   -p  | --password )  shift
-                          marg0=$1
+   -p  | --password )  shift 
+				password=$1
                 		  ;;
-   -cs  | --chain-size )  shift
-   						  marg1=$1
-			              ;;
-   -o0  | --optional0  )  oarg0="true"
-                          ;;
-   -o1  | --optional1  )  shift
-                          oarg1=$1
-                          ;;
+   -cs  | --chain-size )  shift 
+				size=$1
+			          ;;
+   -c  | --consensus  )  shift 
+				consensus=$1
+                                  ;;
+   -o1  | --optional1  )  shift 
+				oarg1=$1
+                          	  ;;
    -h   | --help )        help
                           exit
                           ;;
@@ -91,7 +93,9 @@ do
 done
 
 # Pass here your mandatory args for check
-margs_check $marg0 $marg1
+margs_check $password $size
+
+echo $consensus
 
 # Your stuff goes here
-echo $marg0 | sudo -S python3 go-ethereum/containernet/examples/ethereum_net.py $marg1
+echo $password | sudo -S python3 go-ethereum/containernet/ethereum-python-scripts/ethereum_net.py $size $consensus
