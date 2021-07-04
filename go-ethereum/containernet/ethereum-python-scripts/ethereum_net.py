@@ -42,7 +42,7 @@ def topology(args):
         boot = net.addDocker(
             'boot',
             ip='10.0.0.2',
-            dimage='custom-ethereum-image:bootnode',
+            dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:boot',
             volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
             port_bindings={8545: 8547, 30301: 30301},
@@ -62,7 +62,7 @@ def topology(args):
         d0 = net.addDocker(
             'd0',
             ip='10.0.0.5',
-            dimage='custom-ethereum-image:master',
+            dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:master',
             volumes=['/home/ubuntu/container-chain/go-ethereum/ethdata:/app/ethdata'
                      ,
                      '/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
@@ -85,7 +85,7 @@ def topology(args):
                 d1 = net.addDocker(
                     'd%s' % h,
                     ip='10.0.0.%s' % (h + 6),
-                    dimage='custom-ethereum-image:node',
+                    dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:node',
                     volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
                              ],
                     cpu_shares=20,
@@ -107,7 +107,7 @@ def topology(args):
         boot = net.addDocker(
             'boot',
             ip='10.0.0.2',
-            dimage='custom-ethereum-image:boot-poa',
+            dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:boot-poa',
             volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
             port_bindings={8545: 8547, 30301: 30301},
@@ -127,7 +127,7 @@ def topology(args):
         d0 = net.addDocker(
             'd0',
             ip='10.0.0.5',
-            dimage='custom-ethereum-image:master-poa',
+            dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:master-poa',
             volumes=['/home/ubuntu/container-chain/go-ethereum/ethdata:/app/ethdata'
                      ,
                      '/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
@@ -150,7 +150,7 @@ def topology(args):
                 d1 = net.addDocker(
                     'd%s' % h,
                     ip='10.0.0.%s' % (h + 6),
-                    dimage='custom-ethereum-image:node-poa',
+                    dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:node-poa',
                     volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
                              ],
                     cpu_shares=20,
