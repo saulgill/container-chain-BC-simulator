@@ -27,6 +27,10 @@ def topology(args):
     info('*** Consensus algorithm used will be:', c)
     info('\n')
 
+    r = args.root[0]
+    info('*** Project r is:', r)
+    info('\n')
+
     net = Containernet(controller=Controller)
 
     info('*** Adding controller\n')
@@ -43,7 +47,7 @@ def topology(args):
             'boot',
             ip='10.0.0.2',
             dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:boot',
-            volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
+            volumes=[str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
             port_bindings={8545: 8547, 30301: 30301},
             cpu_shares=20,
@@ -63,9 +67,9 @@ def topology(args):
             'd0',
             ip='10.0.0.5',
             dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:master',
-            volumes=['/home/ubuntu/container-chain/go-ethereum/ethdata:/app/ethdata'
+            volumes=[str(r) + '/go-ethereum/ethdata:/app/ethdata'
                      ,
-                     '/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
+                     str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
             port_bindings={8545: 8545, 30303: 30303},
             cpu_shares=20,
@@ -86,7 +90,7 @@ def topology(args):
                     'd%s' % h,
                     ip='10.0.0.%s' % (h + 6),
                     dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:node',
-                    volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
+                    volumes=[str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                              ],
                     cpu_shares=20,
                     publish_all_ports=False,
@@ -108,7 +112,7 @@ def topology(args):
             'boot',
             ip='10.0.0.2',
             dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:boot-poa',
-            volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
+            volumes=[str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
             port_bindings={8545: 8547, 30301: 30301},
             cpu_shares=20,
@@ -128,9 +132,9 @@ def topology(args):
             'd0',
             ip='10.0.0.5',
             dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:master-poa',
-            volumes=['/home/ubuntu/container-chain/go-ethereum/ethdata:/app/ethdata'
+            volumes=[str(r) + '/go-ethereum/ethdata:/app/ethdata'
                      ,
-                     '/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
+                     str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
             port_bindings={8545: 8545, 30303: 30303},
             cpu_shares=20,
@@ -151,7 +155,7 @@ def topology(args):
                     'd%s' % h,
                     ip='10.0.0.%s' % (h + 6),
                     dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:node-poa',
-                    volumes=['/home/ubuntu/container-chain/go-ethereum/eth-scripts:/app/eth-scripts'
+                    volumes=[str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                              ],
                     cpu_shares=20,
                     publish_all_ports=False,
@@ -186,6 +190,7 @@ if __name__ == '__main__':
                         ,
                         help='the type of consensus algorithm to be used'
                         )
+    parser.add_argument('root', metavar='r', type=str, nargs='+',
+                        help='the root directory of the project')
     args = parser.parse_args()
     topology(args)
-

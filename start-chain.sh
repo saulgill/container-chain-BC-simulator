@@ -5,6 +5,10 @@ margs=2
 
 consensus="pow"
 
+full_path=$(realpath $0)
+root=$(dirname $full_path)
+echo $root
+
 # Common functions - BEGIN
 function example {
     echo -e "example: $script -p my_password -cs 3 -c pow -o2 VAL"
@@ -98,4 +102,4 @@ margs_check $password $size
 echo $consensus
 
 # Your stuff goes here
-echo $password | sudo -S python3 go-ethereum/containernet/ethereum-python-scripts/ethereum_net.py $size $consensus
+echo $password | sudo -S python3 go-ethereum/containernet/ethereum-python-scripts/ethereum_net.py $size $consensus $root
