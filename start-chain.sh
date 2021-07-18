@@ -1,7 +1,7 @@
 #!/bin/bash
 script="start-chain.sh"
 #Declare the number of mandatory args
-margs=2
+margs=1
 
 consensus="pow"
 
@@ -11,7 +11,7 @@ echo $root
 
 # Common functions - BEGIN
 function example {
-    echo -e "example: $script -p my_password -cs 3 -c pow -o2 VAL"
+    echo -e "example: $script -p my_password -cs 3 -c pow"
 }
 
 function usage {
@@ -21,9 +21,9 @@ function usage {
 function help {
   usage
     echo -e "MANDATORY:"
-    echo -e "  -p, --password  your_password  -- Your sudo password. Mininet requires root."
     echo -e "  -cs, --chain-size  number  -- The number of nodes in the desired chain.\n"
     echo -e "OPTION:"
+    echo -e "  -p, --password  your_password  -- Your sudo password, if you have one (Do not enter this argument if you don't have one). Mininet requires root"
     echo -e "  -c, --consensus poa/pow --  The consensus type for the chain poa or pow (pow is default)"
     echo -e "  -o1, --optional2   VAL  The desc of the optional1 String  parameter"
     echo -e "  -h,  --help             Prints this help\n"
@@ -102,4 +102,8 @@ margs_check $password $size
 echo $consensus
 
 # Your stuff goes here
-echo $password | sudo -S python3 go-ethereum/containernet/ethereum-python-scripts/ethereum_net.py $size $consensus $root
+if [ -z $password ]; then
+    sudo python3 go-ethereum/containernet/ethereum-python-scripts/ethereum_net.py $size $consensus $root
+else
+    echo $password | sudo -S python3 go-ethereum/containernet/ethereum-python-scripts/ethereum_net.py $size $consensus $root
+fi

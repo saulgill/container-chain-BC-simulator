@@ -36,6 +36,9 @@ def topology(args):
     info('*** Adding controller\n')
     net.addController('c0')
 
+    # info('*** Adding switch\n')
+    # s1 = net.addSwitch('s1')
+
     info('*** Adding hosts\n')
     info('*** Adding docker containers\n')
     info('*** Setting up bootnode for BC nodes to discover eachother\n')
@@ -49,16 +52,16 @@ def topology(args):
             dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:boot',
             volumes=[str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
-            port_bindings={8545: 8547, 30301: 30301},
+            port_bindings={8545: 8545, 30301: 30301, 8888: 8888},
             cpu_shares=20,
             publish_all_ports=False,
-            )
+        )
         boot.cmdPrint('bootnode -genkey boot.key')
         boot.cmdPrint('echo -n "enode://" > eth-scripts/node_join_id')
-        boot.cmdPrint('bootnode -nodekeyhex $(cat boot.key) -writeaddress | tr -d "\n" >> eth-scripts/node_join_id'
-                      )
-        boot.cmdPrint('echo -n "@10.0.0.2:0?discport=30301" >> eth-scripts/node_join_id'
-                      )
+        boot.cmdPrint(
+            'bootnode -nodekeyhex $(cat boot.key) -writeaddress | tr -d "\n" >> eth-scripts/node_join_id')
+        boot.cmdPrint(
+            'echo -n "@10.0.0.2:0?discport=30301" >> eth-scripts/node_join_id')
         boot.cmdPrint('bootnode -nodekey boot.key &')
 
         info('*** Starting the Ethereum docker containers for the private network'
@@ -67,14 +70,13 @@ def topology(args):
             'd0',
             ip='10.0.0.5',
             dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:master',
-            volumes=[str(r) + '/go-ethereum/ethdata:/app/ethdata'
-                     ,
+            volumes=[str(r) + '/go-ethereum/ethdata:/app/ethdata',
                      str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
-            port_bindings={8545: 8545, 30303: 30303},
+            port_bindings={8545: 8543, 30303: 30303},
             cpu_shares=20,
             publish_all_ports=False,
-            )
+        )
         info('*** Adding switch\n')
         s1 = net.addSwitch('s1')
 
@@ -82,6 +84,8 @@ def topology(args):
         net.addLink(d0, s1)
         net.addLink(s1, boot)
 
+        # The actual object associated with d1 changes every time this loop runs
+        # But, each time, it creates a new container and adds it to the switch
         if n > 1:
             info('*** n is greater than one so the loop will spin up the remaining nodes'
                  )
@@ -92,9 +96,10 @@ def topology(args):
                     dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:node',
                     volumes=[str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                              ],
+                    port_bindings={8545: (8545 + h), 30303: (30303 + h)},
                     cpu_shares=20,
                     publish_all_ports=False,
-                    )
+                )
                 net.addLink(s1, d1)
 
         info('*** Starting network\n')
@@ -106,6 +111,14 @@ def topology(args):
             h.cmdPrint('./eth-scripts/start-new-bc.sh &')
 
         info('*** Chain is running...\n')
+        info('*** Running CLI\n')
+        # This seems to be needed to maintain connectivity between nodes
+        # It causes a mininet CLI to be launched. Terminating the CLI will
+        # stop and remove the containers. In a separate terminal, we can access
+        # the geth CLI to interact with the Blockchain. Bash scripts are provided.
+        CLI(net)
+        info('*** Stopping network')
+        net.stop()
     else:
 
         boot = net.addDocker(
@@ -117,7 +130,7 @@ def topology(args):
             port_bindings={8545: 8547, 30301: 30301},
             cpu_shares=20,
             publish_all_ports=False,
-            )
+        )
         boot.cmdPrint('bootnode -genkey boot.key')
         boot.cmdPrint('echo -n "enode://" > eth-scripts/node_join_id')
         boot.cmdPrint('bootnode -nodekeyhex $(cat boot.key) -writeaddress | tr -d "\n" >> eth-scripts/node_join_id'
@@ -132,14 +145,13 @@ def topology(args):
             'd0',
             ip='10.0.0.5',
             dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/custom-ethereum-image:master-poa',
-            volumes=[str(r) + '/go-ethereum/ethdata:/app/ethdata'
-                     ,
+            volumes=[str(r) + '/go-ethereum/ethdata:/app/ethdata',
                      str(r) + '/go-ethereum/eth-scripts:/app/eth-scripts'
                      ],
             port_bindings={8545: 8545, 30303: 30303},
             cpu_shares=20,
             publish_all_ports=False,
-            )
+        )
         info('*** Adding switch\n')
         s1 = net.addSwitch('s1')
 
@@ -159,7 +171,7 @@ def topology(args):
                              ],
                     cpu_shares=20,
                     publish_all_ports=False,
-                    )
+                )
                 net.addLink(s1, d1)
 
         info('*** Starting network\n')
@@ -171,12 +183,14 @@ def topology(args):
             h.cmdPrint('./eth-scripts/start-new-bc.sh &')
 
         info('*** Chain is running...\n')
-
-
-#    info('*** Running CLI\n')
-#    CLI(net)
-#    info('*** Stopping network')
-#    net.stop()
+        info('*** Running CLI\n')
+        # This seems to be needed to maintain connectivity between nodes
+        # It causes a mininet CLI to be launched. Terminating the CLI will
+        # stop and remove the containers. In a separate terminal, we can access
+        # the geth CLI to interact with the Blockchain. Bash scripts are provided.
+        CLI(net)
+        info('*** Stopping network')
+        net.stop()
 
 if __name__ == '__main__':
     setLogLevel('info')
@@ -186,8 +200,7 @@ if __name__ == '__main__':
                                 )
     parser.add_argument('num_nodes', metavar='n', type=int, nargs='+',
                         help='the number of nodes in the chain')
-    parser.add_argument('consensus', metavar='c', type=str, nargs='+'
-                        ,
+    parser.add_argument('consensus', metavar='c', type=str, nargs='+',
                         help='the type of consensus algorithm to be used'
                         )
     parser.add_argument('root', metavar='r', type=str, nargs='+',
