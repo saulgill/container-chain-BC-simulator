@@ -46,6 +46,17 @@ def topology(args):
     if c == 'pow':
 
         info('*** POW consensus is executing')
+        netflow = net.addDocker(
+            'netflow',
+            ip='10.0.0.1',
+            dimage='netflow:test',
+            port_bindings={9995: 9995},
+            cpu_shares=20,
+            publish_all_ports=False,
+        )
+        netflow.cmdPrint('service nfdump restart &')
+        netflow.cmdPrint('nfcapd -b 10.0.0.1 -l /opt/flowexport/nfcapd &')
+
         boot = net.addDocker(
             'boot',
             ip='10.0.0.2',
@@ -82,14 +93,22 @@ def topology(args):
 
         info('*** Creating links\n')
         net.addLink(d0, s1)
+        net.addLink(s1, netflow)
         net.addLink(s1, boot)
+
+        d0.cmdPrint('fprobe -p -f "host 10.0.0.5" -i d0-eth0 -x 0 -c /var/empty -u nobody -l 1: 10.0.0.1:9995 &')
 
         # The actual object associated with d1 changes every time this loop runs
         # But, each time, it creates a new container and adds it to the switch
         if n > 1:
-            info('*** n is greater than one so the loop will spin up the remaining nodes'
+            info('*** n is greater than one so the loop will spin up the remaining nodes\n'
                  )
             for h in range(n)[1:]:
+                
+                ipAddress = '10.0.0.%s' % (h + 6)
+                info('*** IP ADDRESS IS *** : ' + ipAddress + '\n')
+                interface = 'd%s' % h + '-eth0'
+                info('*** INTERFACE IS *** :' + interface + '\n')
                 d1 = net.addDocker(
                     'd%s' % h,
                     ip='10.0.0.%s' % (h + 6),
@@ -101,6 +120,7 @@ def topology(args):
                     publish_all_ports=False,
                 )
                 net.addLink(s1, d1)
+                d1.cmdPrint('fprobe -p -f "host ' + str(ipAddress) + '" -i ' + str(interface) + ' -x 0 -c /var/empty -u nobody -l 1: 10.0.0.1:9995 &')
 
         info('*** Starting network\n')
         net.start()

@@ -1,0 +1,8 @@
+FROM ubuntu:trusty
+
+RUN apt-get -y update
+RUN apt-get -y install nfdump
+RUN mkdir -p /opt/flowexport/nfcapd
+RUN sed -i -e 's/nfcapd_start=no/nfcapd_start=yes/' /etc/default/nfdump
+
+CMD tail -f dev/null
