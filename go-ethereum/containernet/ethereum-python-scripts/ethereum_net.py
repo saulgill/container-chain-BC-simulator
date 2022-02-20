@@ -49,7 +49,7 @@ def topology(args):
         netflow = net.addDocker(
             'netflow',
             ip='10.0.0.1',
-            dimage='netflow:test',
+            dimage='registry.gitlab.com/sri-ait-ie/phd-projects/saul-gill/container-chain-bc-simulator/netflow-collector:test',
             port_bindings={9995: 9995},
             cpu_shares=20,
             publish_all_ports=False,
