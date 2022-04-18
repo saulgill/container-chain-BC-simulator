@@ -1,0 +1,5 @@
+base:
+  language: go
+  build_tags:
+    - fuzz
+    - blst_disabled
