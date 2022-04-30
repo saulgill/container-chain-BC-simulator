@@ -62,3 +62,4 @@ Finally, you can stop the chain and delete all the containers with the stop scri
 ./stop-chain.sh
 ```
 ---
+# Soon Adding Eth2 Info
