@@ -1,0 +1,1 @@
+/tmp/validator --beacon-rpc-provider localhost:4000 --interop-num-validators=256 --interop-start-index=0 --force-clear-db

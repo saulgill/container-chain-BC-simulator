@@ -128,7 +128,7 @@ func main() {
 }
 
 func writeEnrToFile(enr string) {
-	f, err := os.Create("enr.txt")
+	f, err := os.Create("../go-ethereum/eth-scripts/enr.txt")
 
 	if err != nil {
 		log.Fatal(err)
